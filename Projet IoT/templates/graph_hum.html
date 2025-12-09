@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Historique Humidité + Zoom</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+
+    <style>
+        /* DESIGN BLEU (HUMIDITÉ) */
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); min-height: 100vh; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+
+        .main-wrapper { max-width: 1000px; width: 100%; background: rgba(255,255,255,0.95); border-radius: 30px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); margin-top: 20px;}
+
+        /* BARRE DE FILTRES */
+        .filter-container {
+            display: flex; gap: 10px; justify-content: center; align-items: center;
+            background: #eef9fe; padding: 10px 20px; border-radius: 50px; margin-bottom: 20px; flex-wrap: wrap; border: 1px solid #bce6fa;
+        }
+        .filter-container input { padding: 8px; border: 1px solid #ccc; border-radius: 15px; font-family: 'Poppins'; }
+
+        .btn-action {
+            padding: 8px 20px; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .btn-filter { background: #3498db; }
+        .btn-filter:hover { background: #2980b9; }
+
+        .btn-reset { background: #333; }
+        .btn-reset:hover { background: #000; }
+
+        .btn-back { display: inline-block; margin-bottom: 10px; padding: 10px 20px; background: rgba(0,0,0,0.2); color: white; border-radius: 20px; text-decoration: none; transition: 0.3s; }
+        .btn-back:hover { background: rgba(0,0,0,0.4); }
+
+        canvas { max-height: 400px; width: 100%; }
+        .help-text { text-align: center; font-size: 0.8rem; color: #888; margin-bottom: 10px; font-style: italic;}
+    </style>
+</head>
+<body>
+
+    <a href="/" class="btn-back"><i class="fas fa-arrow-left"></i> Retour Dashboard</a>
+
+    <div class="main-wrapper">
+        <h1 style="text-align: center; color: #3498db;"><i class="fas fa-tint"></i> Analyse Humidité</h1>
+
+        <div class="filter-container">
+            <label>Du :</label> <input type="date" id="startDate">
+            <label>Au :</label> <input type="date" id="endDate">
+
+            <button class="btn-action btn-filter" onclick="updateChartWithDates()">Filtrer</button>
+            <button class="btn-action btn-filter" style="background:#7f8c8d" onclick="resetDateFilter()">Tout</button>
+
+            <button class="btn-action btn-reset" onclick="resetZoomChart()"><i class="fas fa-search-minus"></i> Reset Zoom</button>
+        </div>
+
+        <div class="help-text">💡 Astuce : Utilisez la molette pour zoomer sur une période précise !</div>
+
+        <canvas id="humChart"></canvas>
+    </div>
+
+    <script>
+        const API_URL_BASE = "/api/";
+        let myChart = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchDataAndDraw(API_URL_BASE);
+        });
+
+        // --- GESTION DES DATES ---
+        function updateChartWithDates() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            let url = API_URL_BASE + "?";
+            if (start) url += `start=${start}&`;
+            if (end) url += `end=${end}`;
+            fetchDataAndDraw(url);
+        }
+
+        function resetDateFilter() {
+            document.getElementById('startDate').value = "";
+            document.getElementById('endDate').value = "";
+            fetchDataAndDraw(API_URL_BASE);
+        }
+
+        // --- GESTION DU ZOOM ---
+        function resetZoomChart() {
+            if (myChart) {
+                myChart.resetZoom();
+            }
+        }
+
+        // --- RÉCUPÉRATION DONNÉES ---
+        async function fetchDataAndDraw(url) {
+            try {
+                const response = await fetch(url);
+                const jsonResponse = await response.json();
+
+                // Gestion Universelle des données
+                let rawData = [];
+                if (Array.isArray(jsonResponse)) rawData = jsonResponse;
+                else if (jsonResponse.data) rawData = jsonResponse.data;
+                else if (jsonResponse.results) rawData = jsonResponse.results;
+
+                let data = rawData;
+                if (!url.includes('?')) {
+                    data = rawData.slice(-100); // 100 derniers points par défaut
+                }
+
+                const labels = data.map(e => {
+                    const d = new Date(e.dt);
+                    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                });
+
+                // Récupération Humidité (hum ou humidity)
+                const values = data.map(e => e.hum !== undefined ? e.hum : e.humidity);
+
+                drawChart(labels, values);
+
+            } catch (error) {
+                console.error("Erreur:", error);
+                alert("Pas de données d'humidité !");
+            }
+        }
+
+        // --- DESSIN DU GRAPHIQUE BLEU ---
+        function drawChart(labels, values) {
+            const ctx = document.getElementById('humChart').getContext('2d');
+
+            if (myChart) myChart.destroy();
+
+            // Dégradé Bleu
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(52, 152, 219, 0.5)');
+            gradient.addColorStop(1, 'rgba(52, 152, 219, 0)');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Humidité (%)',
+                        data: values,
+                        borderColor: '#3498db', // Ligne Bleue
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#2980b9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+
+                    // --- CONFIGURATION ZOOM ---
+                    plugins: {
+                        zoom: {
+                            zoom: {
+                                wheel: { enabled: true },
+                                pinch: { enabled: true },
+                                mode: 'x',
+                            },
+                            pan: {
+                                enabled: true,
+                                mode: 'x',
+                            }
+                        },
+                        tooltip: { animation: false }
+                    },
+
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }, // Max 100% pour l'humidité
+                        x: { ticks: { maxTicksLimit: 10 } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
