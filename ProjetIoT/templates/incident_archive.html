@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Archives des incidents</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at center, #1e293b, #0f172a, #000000);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --card-bg: rgba(30, 41, 59, 0.6);
+      --card-border: rgba(255,255,255,0.08);
+      --shadow-color: rgba(0,0,0,0.4);
+    }
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:var(--bg-gradient);
+      color:var(--text-main);
+      margin:0; padding:30px;
+      min-height:100vh;
+    }
+    h1{
+      font-family:'Rajdhani',sans-serif;
+      letter-spacing:3px;
+      text-transform:uppercase;
+      margin:10px 0 25px 0;
+    }
+    .box{
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 15px 35px var(--shadow-color);
+      backdrop-filter: blur(12px);
+    }
+    table{width:100%; border-collapse:collapse; margin-top:12px}
+    th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left}
+    th{color:#3498db; font-family:'Rajdhani'; letter-spacing:1px;}
+    a{color:#1f6feb;text-decoration:none}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 18px; border-radius:30px;
+      border:1px solid var(--card-border);
+      background:rgba(125,125,125,0.1);
+      color:var(--text-main);
+      text-decoration:none;
+      font-family:'Rajdhani'; font-weight:700;
+      margin-bottom:15px;
+    }
+    .btn:hover{background:var(--text-main); color:#0f172a;}
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Boutons en haut -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+    <a class="btn" href="/"><i class="fas fa-arrow-left"></i> Retour au dashboard</a>
+
+    <!-- ✅ NOUVEAU bouton Télécharger CSV incidents -->
+    <a class="btn" href="{% url 'csv_incidents' %}">
+      <i class="fas fa-download"></i> Télécharger CSV
+    </a>
+  </div>
+
+  <h1><i class="fas fa-archive"></i> Archives des incidents (fermés)</h1>
+
+  <div class="box">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Max Temp</th>
+          <th>Compteur</th>
+          <th>Détails</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inc in incidents %}
+        <tr>
+          <td>#{{ inc.id }}</td>
+          <td>{{ inc.created_at|date:"d/m/Y H:i:s" }}</td>
+          <td>{{ inc.ended_at|date:"d/m/Y H:i:s" }}</td>
+          <td>{{ inc.max_temp }} °C</td>
+          <td>{{ inc.counter }}</td>
+          <td><a href="{% url 'incident_detail' inc.id %}">Voir</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Aucun incident archivé.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

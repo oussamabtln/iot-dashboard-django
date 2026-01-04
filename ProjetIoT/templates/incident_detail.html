@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Détails Incident</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at center, #1e293b, #0f172a, #000000);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --card-bg: rgba(30, 41, 59, 0.6);
+      --card-border: rgba(255,255,255,0.08);
+      --shadow-color: rgba(0,0,0,0.4);
+    }
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:var(--bg-gradient);
+      color:var(--text-main);
+      margin:0; padding:30px;
+      min-height:100vh;
+    }
+    h1{
+      font-family:'Rajdhani',sans-serif;
+      letter-spacing:3px;
+      text-transform:uppercase;
+      margin:10px 0 25px 0;
+    }
+    .box{
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 15px 35px var(--shadow-color);
+      backdrop-filter: blur(12px);
+    }
+    .row{margin:10px 0}
+    b{display:inline-block;width:180px;color:#3498db;font-family:'Rajdhani'}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 18px; border-radius:30px;
+      border:1px solid var(--card-border);
+      background:rgba(125,125,125,0.1);
+      color:var(--text-main);
+      text-decoration:none;
+      font-family:'Rajdhani'; font-weight:700;
+      margin-bottom:15px;
+    }
+    .btn:hover{background:var(--text-main); color:#0f172a;}
+    hr{border:0;border-top:1px solid rgba(255,255,255,0.08); margin:18px 0;}
+  </style>
+</head>
+<body>
+  <a class="btn" href="{% url 'incident_archive' %}"><i class="fas fa-arrow-left"></i> Retour aux archives</a>
+  <h1><i class="fas fa-file-circle-exclamation"></i> Détails incident #{{ incident.id }}</h1>
+
+  <div class="box">
+    <div class="row"><b>Statut :</b> {% if incident.is_open %}OUVERT{% else %}FERMÉ{% endif %}</div>
+    <div class="row"><b>Début :</b> {{ incident.created_at|date:"d/m/Y H:i:s" }}</div>
+    <div class="row"><b>Fin :</b> {{ incident.ended_at|date:"d/m/Y H:i:s" }}</div>
+    <div class="row"><b>Temp max :</b> {{ incident.max_temp }} °C</div>
+    <div class="row"><b>Compteur :</b> {{ incident.counter }}</div>
+
+    <hr>
+
+    <div class="row"><b>Opérateur 1 ACK :</b> {{ incident.op1_ack }}</div>
+    <div class="row"><b>Opérateur 1 com :</b> {{ incident.op1_comment|default:"-" }}</div>
+
+    <div class="row"><b>Opérateur 2 ACK :</b> {{ incident.op2_ack }}</div>
+    <div class="row"><b>Opérateur 2 com :</b> {{ incident.op2_comment|default:"-" }}</div>
+
+    <div class="row"><b>Opérateur 3 ACK :</b> {{ incident.op3_ack }}</div>
+    <div class="row"><b>Opérateur 3 com :</b> {{ incident.op3_comment|default:"-" }}</div>
+  </div>
+</body>
+</html>

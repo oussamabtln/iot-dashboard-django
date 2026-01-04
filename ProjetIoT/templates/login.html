@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion opérateur | Supervision IoT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at center, #1e293b, #0f172a, #000000);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --card-bg: rgba(30, 41, 59, 0.6);
+      --card-border: rgba(255,255,255,0.08);
+      --shadow-color: rgba(0,0,0,0.4);
+      --input-bg: rgba(0,0,0,0.4);
+      --modal-bg: #1e293b;
+    }
+    .light-mode {
+      --bg-gradient: radial-gradient(circle at center, #ffffff, #f1f5f9, #cbd5e1);
+      --text-main: #1e293b;
+      --text-sub: #475569;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0,0,0,0.1);
+      --shadow-color: rgba(0,0,0,0.1);
+      --input-bg: rgba(255,255,255,0.9);
+      --modal-bg: #f8fafc;
+    }
+
+    body{
+      font-family:'Segoe UI',sans-serif;
+      background:var(--bg-gradient);
+      background-size:400% 400%;
+      animation:gradientBG 15s ease infinite;
+      color:var(--text-main);
+      margin:0; padding:20px;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow-x:hidden;
+      transition:.4s;
+      position:relative;
+    }
+    @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    body::before{
+      content:""; position:absolute; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 5 L55 5 L55 55 L5 55 Z' fill='none' stroke='rgba(100, 100, 100, 0.05)' stroke-width='1'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:-1;
+    }
+
+    .theme-switch{
+      position:absolute; top:20px; right:20px; z-index:1000;
+      background:var(--card-bg); border:1px solid var(--text-sub);
+      color:var(--text-main); padding:10px 15px; border-radius:30px;
+      cursor:pointer; font-family:'Rajdhani'; font-weight:bold;
+      transition:.3s; backdrop-filter: blur(8px);
+    }
+    .theme-switch:hover{transform:scale(1.05); box-shadow:0 0 15px var(--shadow-color)}
+
+    .login-card{
+      width: 420px;
+      max-width: 92vw;
+      padding: 34px 30px;
+      border-radius: 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 18px 40px var(--shadow-color);
+      backdrop-filter: blur(14px);
+      text-align:center;
+    }
+
+    .title{
+      font-family:'Rajdhani',sans-serif;
+      font-weight:900;
+      letter-spacing:2px;
+      font-size: 2rem;
+      margin:0 0 10px;
+      background:linear-gradient(90deg,#3498db,#f39c12);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      text-transform:uppercase;
+    }
+
+    .subtitle{
+      color: var(--text-sub);
+      margin: 0 0 24px;
+      font-weight: 600;
+    }
+
+    .field{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      border:1px solid rgba(255,255,255,0.12);
+      background: var(--input-bg);
+      padding: 12px 14px;
+      border-radius: 16px;
+      margin-bottom: 14px;
+    }
+    .field i{ color: var(--text-sub); }
+    .field input{
+      border:none;
+      outline:none;
+      background:transparent;
+      width:100%;
+      color: var(--text-main);
+      font-size: 1rem;
+    }
+    .field input::placeholder{ color: rgba(148,163,184,.85); }
+
+    .btn{
+      width:100%;
+      border:none;
+      cursor:pointer;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-family:'Rajdhani';
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-size: 1.05rem;
+      color:white;
+      background:linear-gradient(45deg,#3498db,#f39c12);
+      transition:.25s;
+      margin-top: 6px;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow:0 12px 22px var(--shadow-color); }
+
+    /* ✅ AJOUT : bouton secondaire */
+    .btn-secondary{
+      width:100%;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top: 10px;
+      padding: 12px 16px;
+      border-radius: 18px;
+      text-decoration:none;
+      font-family:'Rajdhani';
+      font-weight: 900;
+      letter-spacing: 1px;
+      font-size: 1.02rem;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text-main);
+      transition: .25s;
+    }
+    .btn-secondary:hover{
+      transform: translateY(-2px);
+      box-shadow:0 12px 22px var(--shadow-color);
+      background: var(--text-main);
+      color: var(--modal-bg);
+    }
+
+    .error{
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.35);
+      color: #fecaca;
+      padding: 12px 14px;
+      border-radius: 16px;
+      margin: 0 0 14px;
+      font-family:'Rajdhani';
+      font-weight: 800;
+    }
+
+    .footer{
+      margin-top: 18px;
+      color: var(--text-sub);
+      font-size: .95rem;
+    }
+    .footer a{
+      color: var(--text-main);
+      font-weight: 800;
+      text-decoration:none;
+      border-bottom: 1px dashed rgba(255,255,255,.25);
+    }
+  </style>
+</head>
+
+<body>
+  <button class="theme-switch" type="button" onclick="toggleTheme()">
+    <i class="fas fa-adjust"></i> MODE JOUR/NUIT
+  </button>
+
+  <div class="login-card">
+    <div class="title"><i class="fas fa-user-shield"></i> Connexion opérateur</div>
+    <div class="subtitle">Accès à la supervision IoT</div>
+
+    {% if form.errors %}
+      <div class="error"><i class="fas fa-triangle-exclamation"></i> Login ou mot de passe incorrect</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="field">
+        <i class="fas fa-user"></i>
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+      </div>
+
+      <div class="field">
+        <i class="fas fa-lock"></i>
+        <input type="password" name="password" placeholder="Mot de passe" required>
+      </div>
+
+      <button class="btn" type="submit">
+        <i class="fas fa-right-to-bracket"></i> SE CONNECTER
+      </button>
+    </form>
+
+    <!-- ✅ AJOUT : bouton créer compte (Directeur) -->
+    <a class="btn-secondary" href="{% url 'create_operateur' %}">
+      <i class="fas fa-user-plus"></i> CRÉER UN COMPTE (DIRECTEUR)
+    </a>
+
+    <div class="footer">
+      Retour au dashboard : <a href="{% url 'dashboard' %}">Supervision</a>
+    </div>
+  </div>
+
+  <script>
+    const THEME_KEY="theme_mode";
+    function applySavedTheme(){
+      const saved=localStorage.getItem(THEME_KEY);
+      if(saved==="light") document.body.classList.add("light-mode");
+      if(saved==="dark") document.body.classList.remove("light-mode");
+    }
+    applySavedTheme();
+
+    function toggleTheme(){
+      document.body.classList.toggle("light-mode");
+      localStorage.setItem(THEME_KEY, document.body.classList.contains("light-mode") ? "light" : "dark");
+    }
+  </script>
+</body>
+</html>

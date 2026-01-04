@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Créer un compte opérateur</title>
+
+  <style>
+    :root{
+      --bg: #0f172a;
+      --card: rgba(30,41,59,.75);
+      --border: rgba(255,255,255,.12);
+      --txt: #f8fafc;
+      --sub: #94a3b8;
+      --inp: rgba(0,0,0,.35);
+      --accent: #22c55e;
+      --danger: #ef4444;
+    }
+
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background: radial-gradient(circle at center, #1e293b, #0f172a, #000);
+      color:var(--txt);
+      font-family: "Segoe UI", Arial, sans-serif;
+      position:relative;
+    }
+
+    /* ✅ IMPORTANT : si un overlay existe, il ne doit JAMAIS bloquer le clic */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events:none; /* ✅ empêche de bloquer la saisie */
+      z-index:0;
+    }
+
+    .wrap{
+      width:100%;
+      max-width: 520px;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 15px 40px rgba(0,0,0,.45);
+      backdrop-filter: blur(14px);
+      position:relative;
+      z-index:2; /* ✅ au-dessus */
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size: 1.5rem;
+      letter-spacing: .5px;
+    }
+
+    .sub{
+      color: var(--sub);
+      margin-bottom: 18px;
+      font-size: .95rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    label{
+      font-size: .9rem;
+      color: var(--sub);
+      margin-bottom: 6px;
+      display:block;
+    }
+
+    input, select{
+      width:100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: var(--inp);
+      color: var(--txt);
+      outline: none;
+
+      /* ✅ au cas où un CSS global bloque : */
+      pointer-events: auto;
+      position: relative;
+      z-index: 5;
+    }
+
+    input:focus, select:focus{
+      border-color: rgba(34,197,94,.55);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+    }
+
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      margin-top: 14px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn-primary{
+      background: linear-gradient(45deg, #16a34a, #22c55e);
+      color: #06240f;
+      flex:1;
+    }
+    .btn-primary:hover{filter:brightness(1.05);}
+
+    .btn-secondary{
+      background: rgba(255,255,255,.08);
+      border:1px solid var(--border);
+      color: var(--txt);
+    }
+
+    .msgs{
+      margin-bottom: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .msg{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.25);
+      color: var(--txt);
+      font-weight: 600;
+      font-size: .95rem;
+    }
+    .msg.error{border-color: rgba(239,68,68,.5);}
+    .msg.success{border-color: rgba(34,197,94,.5);}
+
+    @media (max-width:520px){
+      .row2{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Créer un compte opérateur</h1>
+    <div class="sub">Remplis les informations puis clique sur “Créer”.</div>
+
+    {% if messages %}
+      <div class="msgs">
+        {% for message in messages %}
+          <div class="msg {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'create_operateur' %}">
+      {% csrf_token %}
+
+      <div class="grid">
+        <div>
+          <label>Username</label>
+          <input type="text" name="username" required autocomplete="off">
+        </div>
+
+        <div>
+          <label>Mot de passe</label>
+          <input type="password" name="password" required autocomplete="new-password">
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>Prénom</label>
+            <input type="text" name="prenom" autocomplete="off">
+          </div>
+          <div>
+            <label>Nom</label>
+            <input type="text" name="nom" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="row2">
+          <div>
+            <label>Téléphone</label>
+            <input type="text" name="telephone" autocomplete="off">
+          </div>
+
+          <div>
+            <label>Grade</label>
+            <select name="role" required>
+              {% for code, label in roles %}
+                <option value="{{ code }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" type="submit">✅ Créer</button>
+        <a class="btn btn-secondary" href="{% url 'dashboard' %}">← Retour dashboard</a>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
