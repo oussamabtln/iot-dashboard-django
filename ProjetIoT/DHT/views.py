@@ -15,7 +15,10 @@ from django.db import models
 
 from .models import Dht11, Incident, OperateurProfile
 
+from django.http import JsonResponse
 
+def healthz(request):
+    return JsonResponse({"status": "ok"})
 MIN_OK = 2.0
 MAX_OK = 8.0
 COUNTER_STEP_SECONDS = 30  # ✅ compteur auto chaque 30s

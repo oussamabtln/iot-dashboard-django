@@ -44,4 +44,6 @@ urlpatterns = [
     # Incidents
     path("incident/archive/", views.incident_archive, name="incident_archive"),
     path("incident/<int:pk>/", views.incident_detail, name="incident_detail"),
+
+    path("healthz/", views.healthz, name="healthz"),
 ]
