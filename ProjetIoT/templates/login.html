@@ -10,20 +10,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    :root {
+    :root{
       --bg-gradient: radial-gradient(circle at center, #1e293b, #0f172a, #000000);
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
+      --text-main:#f8fafc;
+      --text-sub:#94a3b8;
       --card-bg: rgba(30, 41, 59, 0.6);
       --card-border: rgba(255,255,255,0.08);
       --shadow-color: rgba(0,0,0,0.4);
       --input-bg: rgba(0,0,0,0.4);
       --modal-bg: #1e293b;
     }
-    .light-mode {
+    .light-mode{
       --bg-gradient: radial-gradient(circle at center, #ffffff, #f1f5f9, #cbd5e1);
-      --text-main: #1e293b;
-      --text-sub: #475569;
+      --text-main:#1e293b;
+      --text-sub:#475569;
       --card-bg: rgba(255, 255, 255, 0.85);
       --card-border: rgba(0,0,0,0.1);
       --shadow-color: rgba(0,0,0,0.1);
@@ -46,7 +46,11 @@
       transition:.4s;
       position:relative;
     }
-    @keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes gradientBG{
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
 
     body::before{
       content:""; position:absolute; inset:0;
@@ -64,13 +68,12 @@
     .theme-switch:hover{transform:scale(1.05); box-shadow:0 0 15px var(--shadow-color)}
 
     .login-card{
-      width: 420px;
-      max-width: 92vw;
-      padding: 34px 30px;
-      border-radius: 28px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      box-shadow: 0 18px 40px var(--shadow-color);
+      width:420px; max-width:92vw;
+      padding:34px 30px;
+      border-radius:28px;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      box-shadow:0 18px 40px var(--shadow-color);
       backdrop-filter: blur(14px);
       text-align:center;
     }
@@ -79,7 +82,7 @@
       font-family:'Rajdhani',sans-serif;
       font-weight:900;
       letter-spacing:2px;
-      font-size: 2rem;
+      font-size:2rem;
       margin:0 0 10px;
       background:linear-gradient(90deg,#3498db,#f39c12);
       -webkit-background-clip:text;
@@ -88,9 +91,42 @@
     }
 
     .subtitle{
-      color: var(--text-sub);
-      margin: 0 0 24px;
-      font-weight: 600;
+      color:var(--text-sub);
+      margin:0 0 18px;
+      font-weight:600;
+    }
+
+    /* Messages Django (success/error/info/warning) */
+    .msg{
+      padding:12px 14px;
+      border-radius:16px;
+      margin:0 0 14px;
+      font-family:'Rajdhani';
+      font-weight:800;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text-main);
+      text-align:left;
+    }
+    .msg.success{
+      background: rgba(34,197,94,.12);
+      border-color: rgba(34,197,94,.35);
+      color: #d1fae5;
+    }
+    .msg.error{
+      background: rgba(239,68,68,.12);
+      border-color: rgba(239,68,68,.35);
+      color:#fecaca;
+    }
+    .msg.info{
+      background: rgba(59,130,246,.12);
+      border-color: rgba(59,130,246,.35);
+      color:#dbeafe;
+    }
+    .msg.warning{
+      background: rgba(245,158,11,.12);
+      border-color: rgba(245,158,11,.35);
+      color:#ffedd5;
     }
 
     .field{
@@ -99,9 +135,9 @@
       align-items:center;
       border:1px solid rgba(255,255,255,0.12);
       background: var(--input-bg);
-      padding: 12px 14px;
-      border-radius: 16px;
-      margin-bottom: 14px;
+      padding:12px 14px;
+      border-radius:16px;
+      margin-bottom:14px;
     }
     .field i{ color: var(--text-sub); }
     .field input{
@@ -109,8 +145,8 @@
       outline:none;
       background:transparent;
       width:100%;
-      color: var(--text-main);
-      font-size: 1rem;
+      color:var(--text-main);
+      font-size:1rem;
     }
     .field input::placeholder{ color: rgba(148,163,184,.85); }
 
@@ -118,67 +154,73 @@
       width:100%;
       border:none;
       cursor:pointer;
-      padding: 12px 16px;
-      border-radius: 18px;
+      padding:12px 16px;
+      border-radius:18px;
       font-family:'Rajdhani';
-      font-weight: 900;
-      letter-spacing: 1px;
-      font-size: 1.05rem;
+      font-weight:900;
+      letter-spacing:1px;
+      font-size:1.05rem;
       color:white;
       background:linear-gradient(45deg,#3498db,#f39c12);
       transition:.25s;
-      margin-top: 6px;
+      margin-top:6px;
     }
-    .btn:hover{ transform: translateY(-2px); box-shadow:0 12px 22px var(--shadow-color); }
+    .btn:hover{
+      transform: translateY(-2px);
+      box-shadow:0 12px 22px var(--shadow-color);
+    }
 
-    /* ✅ AJOUT : bouton secondaire */
-    .btn-secondary{
-      width:100%;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      margin-top: 10px;
-      padding: 12px 16px;
+    /* =========================
+       ✅ Barre "Créer un compte"
+       (Design propre + bordure dégradée)
+       ========================= */
+    .create-bar{
+      margin-top: 12px;
       border-radius: 18px;
-      text-decoration:none;
-      font-family:'Rajdhani';
+      padding: 1px;
+      background: linear-gradient(90deg, rgba(52,152,219,.75), rgba(243,156,18,.75));
+      box-shadow: 0 18px 35px var(--shadow-color);
+    }
+    .create-btn{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      padding: 13px 16px;
+      border-radius: 17px;
+      text-decoration: none;
+
+      font-family: 'Rajdhani';
       font-weight: 900;
       letter-spacing: 1px;
       font-size: 1.02rem;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
+
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
       color: var(--text-main);
+
+      backdrop-filter: blur(10px);
       transition: .25s;
     }
-    .btn-secondary:hover{
+    .create-btn:hover{
       transform: translateY(-2px);
-      box-shadow:0 12px 22px var(--shadow-color);
       background: var(--text-main);
       color: var(--modal-bg);
     }
-
-    .error{
-      background: rgba(239,68,68,.12);
-      border: 1px solid rgba(239,68,68,.35);
-      color: #fecaca;
-      padding: 12px 14px;
-      border-radius: 16px;
-      margin: 0 0 14px;
-      font-family:'Rajdhani';
-      font-weight: 800;
-    }
+    .create-btn i{ font-size: 1.05rem; }
 
     .footer{
-      margin-top: 18px;
-      color: var(--text-sub);
-      font-size: .95rem;
+      margin-top:18px;
+      color:var(--text-sub);
+      font-size:.95rem;
     }
     .footer a{
-      color: var(--text-main);
-      font-weight: 800;
+      color:var(--text-main);
+      font-weight:800;
       text-decoration:none;
-      border-bottom: 1px dashed rgba(255,255,255,.25);
+      border-bottom:1px dashed rgba(255,255,255,.25);
     }
   </style>
 </head>
@@ -192,21 +234,35 @@
     <div class="title"><i class="fas fa-user-shield"></i> Connexion opérateur</div>
     <div class="subtitle">Accès à la supervision IoT</div>
 
-    {% if form.errors %}
-      <div class="error"><i class="fas fa-triangle-exclamation"></i> Login ou mot de passe incorrect</div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg {{ message.tags|default:'info' }}">
+          <i class="fas fa-circle-info"></i> {{ message }}
+        </div>
+      {% endfor %}
     {% endif %}
 
-    <form method="post">
+
+    {% if form.errors %}
+      <div class="msg error">
+        <i class="fas fa-triangle-exclamation"></i>
+        Nom d'utilisateur ou mot de passe incorrect.
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
 
       <div class="field">
         <i class="fas fa-user"></i>
-        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required autocomplete="username">
       </div>
 
       <div class="field">
         <i class="fas fa-lock"></i>
-        <input type="password" name="password" placeholder="Mot de passe" required>
+        <input type="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
       </div>
 
       <button class="btn" type="submit">
@@ -214,10 +270,14 @@
       </button>
     </form>
 
-    <!-- ✅ AJOUT : bouton créer compte (Directeur) -->
-    <a class="btn-secondary" href="{% url 'create_operateur' %}">
-      <i class="fas fa-user-plus"></i> CRÉER UN COMPTE (DIRECTEUR)
-    </a>
+
+    {% if request.user.is_authenticated and is_directeur %}
+      <div class="create-bar">
+        <a class="create-btn" href="{% url 'create_operateur' %}">
+          <i class="fas fa-user-plus"></i> CRÉER UN COMPTE (DIRECTEUR)
+        </a>
+      </div>
+    {% endif %}
 
     <div class="footer">
       Retour au dashboard : <a href="{% url 'dashboard' %}">Supervision</a>
@@ -225,17 +285,24 @@
   </div>
 
   <script>
-    const THEME_KEY="theme_mode";
+    // ==========================================================
+    // ✅ Gestion du thème (jour/nuit) - simple et stable
+    // ==========================================================
+    const THEME_KEY = "theme_mode";
+
     function applySavedTheme(){
-      const saved=localStorage.getItem(THEME_KEY);
-      if(saved==="light") document.body.classList.add("light-mode");
-      if(saved==="dark") document.body.classList.remove("light-mode");
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === "light") document.body.classList.add("light-mode");
+      if (saved === "dark") document.body.classList.remove("light-mode");
     }
     applySavedTheme();
 
     function toggleTheme(){
       document.body.classList.toggle("light-mode");
-      localStorage.setItem(THEME_KEY, document.body.classList.contains("light-mode") ? "light" : "dark");
+      localStorage.setItem(
+        THEME_KEY,
+        document.body.classList.contains("light-mode") ? "light" : "dark"
+      );
     }
   </script>
 </body>

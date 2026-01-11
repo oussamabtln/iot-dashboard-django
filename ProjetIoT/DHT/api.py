@@ -1,27 +1,42 @@
+# DHT/api.py
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-from django.core.mail import send_mail
-from django.conf import settings
 
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework.response import Response
 
 from .models import Dht11, Incident
+
+try:
+    from .models import IoTSettings
+except Exception:
+    IoTSettings = None
+
 from .serializers import DHT11serialize
+from .services import process_temperature_event, send_email_alert, send_whatsapp_twilio
 
-# --- RÉGLAGE DU DOMAINE (FRIGO / MÉDICAMENTS) ---
-TEMP_MIN = 2  # Alerte si en dessous de 2°C
-TEMP_MAX = 8  # Alerte si au dessus de 8°C
+TEMP_MIN_DEFAULT = 2.0
+TEMP_MAX_DEFAULT = 8.0
 
 
-# --- API DE RÉCUPÉRATION (GET) ---
-@api_view(['GET'])
+def get_limits():
+    """Retourne (temp_min, temp_max) depuis DB si IoTSettings existe."""
+    if IoTSettings is None:
+        return TEMP_MIN_DEFAULT, TEMP_MAX_DEFAULT
+    try:
+        s = IoTSettings.get_solo()
+        return float(s.temp_min), float(s.temp_max)
+    except Exception:
+        return TEMP_MIN_DEFAULT, TEMP_MAX_DEFAULT
+
+
+@api_view(["GET"])
 def Dlist(request):
-    qs = Dht11.objects.all().order_by('dt')
+    qs = Dht11.objects.all().order_by("dt")
 
-    start_date = request.GET.get('start')
-    end_date = request.GET.get('end')
+    start_date = request.GET.get("start")
+    end_date = request.GET.get("end")
 
     if start_date:
         parsed_start = parse_date(start_date)
@@ -34,104 +49,129 @@ def Dlist(request):
             qs = qs.filter(dt__date__lte=parsed_end)
 
     data = DHT11serialize(qs, many=True).data
-    return Response({'data': data})
+    return Response({"data": data})
 
 
-# --- API D'ENREGISTREMENT (POST) ---
 class Dhtviews(generics.CreateAPIView):
     queryset = Dht11.objects.all()
     serializer_class = DHT11serialize
 
     def perform_create(self, serializer):
         instance = serializer.save()
-        temp = instance.temp
 
-        # sécurité
-        if temp is None:
+        if instance.temp is None:
             return
 
+        temp = float(instance.temp)
         now = timezone.now()
+        temp_min, temp_max = get_limits()
 
-        # incident ouvert actuel (s'il existe)
+        # ✅ 0) Toujours déclencher l'alerte (Email/WA/Call) via services.py
+        # (le service décide si hors plage)
+        process_temperature_event(temp, recipients=["oussama.boutalount.23@ump.ac.ma"])
+
         inc = Incident.objects.filter(is_open=True).order_by("-created_at").first()
 
-        # ---------- Gestion incident (création/fermeture) ----------
-        in_range = (TEMP_MIN <= temp <= TEMP_MAX)
-
+        # 1) Gestion incident (fermer si OK)
+        in_range = (temp_min <= temp <= temp_max)
         if in_range:
-            # si OK => fermer incident ouvert
             if inc:
                 inc.is_open = False
                 inc.ended_at = now
                 inc.save(update_fields=["is_open", "ended_at"])
             return
 
-        # hors plage => déterminer type
-        kind = "HOT" if temp > TEMP_MAX else "COLD"
+        # 2) Création / mise à jour incident
+        kind = "HOT" if temp > temp_max else "COLD"
 
-        # si aucun incident ouvert => créer un nouveau
         if not inc:
-            Incident.objects.create(
+            inc = Incident.objects.create(
                 kind=kind,
-                max_temp=temp,           # HOT => max ; COLD => min (stocké dans max_temp)
+                max_temp=temp,
                 counter=0,
-                last_counter_at=now,     # important pour compteur auto 30s
+                last_counter_at=now,
+                last_dht_id=instance.id,
                 is_open=True,
+                notified_lvl1=False,
+                notified_lvl2=False,
+                notified_lvl3=False,
+                temp_min_autorisee=temp_min,
+                temp_max_autorisee=temp_max,
             )
         else:
-            # si incident existant mais type change (ex: HOT -> COLD), on clôture et on crée un nouveau
+            # si type change
             if inc.kind != kind:
                 inc.is_open = False
                 inc.ended_at = now
                 inc.save(update_fields=["is_open", "ended_at"])
 
-                Incident.objects.create(
+                inc = Incident.objects.create(
                     kind=kind,
                     max_temp=temp,
                     counter=0,
                     last_counter_at=now,
+                    last_dht_id=instance.id,
                     is_open=True,
+                    notified_lvl1=False,
+                    notified_lvl2=False,
+                    notified_lvl3=False,
+                    temp_min_autorisee=temp_min,
+                    temp_max_autorisee=temp_max,
                 )
             else:
-                # même incident => mise à jour température extrême
+                # mise à jour extrême
                 if inc.max_temp is None:
                     inc.max_temp = temp
                 else:
-                    if inc.kind == "HOT":
-                        if temp > float(inc.max_temp):
-                            inc.max_temp = temp
-                    else:  # COLD => on garde le MIN dans max_temp
-                        if temp < float(inc.max_temp):
-                            inc.max_temp = temp
+                    if inc.kind == "HOT" and temp > float(inc.max_temp):
+                        inc.max_temp = temp
+                    if inc.kind == "COLD" and temp < float(inc.max_temp):
+                        inc.max_temp = temp
 
-                # si last_counter_at vide, on l'initialise
-                if inc.last_counter_at is None:
-                    inc.last_counter_at = now
+                # compteur à chaque nouvelle mesure
+                if inc.last_dht_id != instance.id:
+                    inc.counter = min(9, (inc.counter or 0) + 1)
+                    inc.last_dht_id = instance.id
 
-                inc.save(update_fields=["max_temp", "last_counter_at"])
+                inc.last_counter_at = now
+                inc.save(update_fields=["kind", "max_temp", "counter", "last_dht_id", "last_counter_at"])
 
-        # ---------- EMAIL (ton code, gardé) ----------
-        if temp < TEMP_MIN or temp > TEMP_MAX:
-            if temp < TEMP_MIN:
-                sujet = "❄️ ALERTE CRITIQUE : GEL DÉTECTÉ"
-                message = (
-                    f"URGENT : La température est descendue à {temp:.1f}°C.\n"
-                    f"C'est en dessous du minimum vital de {TEMP_MIN}°C."
-                )
-            else:
-                sujet = "🔥 ALERTE CRITIQUE : SURCHAUFFE"
-                message = (
-                    f"URGENT : La température est montée à {temp:.1f}°C.\n"
-                    f"La limite maximale de {TEMP_MAX}°C est dépassée."
-                )
+        # 3) Message clair
+        if temp < temp_min:
+            subject = "❄️ ALERTE CRITIQUE : GEL DÉTECTÉ"
+            msg = (
+                f"URGENT : Température trop basse.\n"
+                f"T = {temp:.1f}°C < {temp_min:.1f}°C\n"
+                f"Incident: {inc.kind} | ID: {inc.id}"
+            )
+        else:
+            subject = "🔥 ALERTE CRITIQUE : SURCHAUFFE"
+            msg = (
+                f"URGENT : Température trop haute.\n"
+                f"T = {temp:.1f}°C > {temp_max:.1f}°C\n"
+                f"Incident: {inc.kind} | ID: {inc.id}"
+            )
 
-            try:
-                send_mail(
-                    subject=sujet,
-                    message=message,
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=["oussama.boutalount.23@ump.ac.ma"],
-                    fail_silently=True,
-                )
-            except Exception as e:
-                print(f"Erreur envoi email: {e}")
+        recipients = ["oussama.boutalount.23@ump.ac.ma"]
+        counter = int(getattr(inc, "counter", 0) or 0)
+
+        # Niveau 1
+        if not inc.notified_lvl1:
+            send_email_alert(subject, msg, recipients)
+            send_whatsapp_twilio("Niveau 1 - " + msg)
+            inc.notified_lvl1 = True
+            inc.save(update_fields=["notified_lvl1"])
+
+        # Niveau 2
+        if counter >= 4 and not inc.notified_lvl2:
+            send_email_alert("⚠️ Niveau 2 - " + subject, msg, recipients)
+            send_whatsapp_twilio("Niveau 2 - " + msg)
+            inc.notified_lvl2 = True
+            inc.save(update_fields=["notified_lvl2"])
+
+        # Niveau 3
+        if counter >= 7 and not inc.notified_lvl3:
+            send_email_alert("🚨 Niveau 3 - " + subject, msg, recipients)
+            send_whatsapp_twilio("Niveau 3 - " + msg)
+            inc.notified_lvl3 = True
+            inc.save(update_fields=["notified_lvl3"])

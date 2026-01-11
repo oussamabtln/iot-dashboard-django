@@ -21,7 +21,13 @@ from django.contrib import admin
 from django.urls import path
 from django.contrib import admin
 from django.urls import path,include
+from django.http import HttpResponse
+
+def favicon(request):
+    return HttpResponse(status=204)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",include('DHT.urls')),
+    path("favicon.ico", favicon),
 ]

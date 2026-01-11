@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin_custom/admin.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static 'admin_custom/admin.js' %}"></script>
+{% endblock %}
+
+{% block branding %}
+  <div class="admin-brand">
+    <div class="admin-title">
+      <i class="fas fa-shield-halved"></i>
+      Supervision IoT — Administration
+    </div>
+    <div class="admin-subtitle">Gestion opérateurs, incidents et mesures capteurs</div>
+  </div>
+{% endblock %}
+
+{% block nav-global %}
+  <div class="admin-nav">
+    <a class="admin-btn" href="{% url 'dashboard' %}">
+      ← Retour Dashboard
+    </a>
+  </div>
+{% endblock %}

@@ -64,6 +64,28 @@
     <div class="row"><b>Compteur :</b> {{ incident.counter }}</div>
 
     <hr>
+    <hr>
+
+<div class="row">
+  <b>Historique commentaires :</b>
+</div>
+
+{% if comments %}
+  {% for c in comments %}
+    <div class="row" style="margin-left:10px;">
+      <b style="width:180px;">
+        {{ c.get_role_display }} :
+      </b>
+      <span>{{ c.text }}</span>
+      <span style="color:#94a3b8;"> — {{ c.created_at|date:"d/m/Y H:i:s" }}</span>
+      {% if c.user %}
+        <span style="color:#94a3b8;"> ({{ c.user.username }})</span>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="row" style="color:#94a3b8;">Aucun commentaire.</div>
+{% endif %}
 
     <div class="row"><b>Opérateur 1 ACK :</b> {{ incident.op1_ack }}</div>
     <div class="row"><b>Opérateur 1 com :</b> {{ incident.op1_comment|default:"-" }}</div>

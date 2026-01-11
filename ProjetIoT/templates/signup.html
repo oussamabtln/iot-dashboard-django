@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Demande de compte</title>
+</head>
+<body>
+  <h2>Demande de création de compte (attente Directeur)</h2>
+
+  {% if messages %}
+    {% for m in messages %}<p>{{ m }}</p>{% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <input name="username" placeholder="Username" required><br><br>
+    <input type="password" name="password" placeholder="Mot de passe" required><br><br>
+
+    <input name="prenom" placeholder="Prénom" required><br><br>
+    <input name="nom" placeholder="Nom" required><br><br>
+
+    <input name="email" placeholder="Email"><br><br>
+    <input name="telephone" placeholder="Téléphone"><br><br>
+    <input name="telegram" placeholder="Telegram (@username ou numéro)"><br><br>
+
+    <button type="submit">Envoyer la demande</button>
+  </form>
+
+  <p><a href="{% url 'login' %}">Retour login</a></p>
+</body>
+</html>

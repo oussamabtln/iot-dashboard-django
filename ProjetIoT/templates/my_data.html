@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mes données</title>
+  <style>
+    body{margin:0; min-height:100vh; display:flex; justify-content:center; align-items:center;
+      background:#0f172a; color:#f8fafc; font-family:Segoe UI, Arial;}
+    .card{width:min(560px,95%); background:rgba(30,41,59,.8); border:1px solid rgba(255,255,255,.12);
+      border-radius:20px; padding:20px; box-shadow:0 15px 40px rgba(0,0,0,.45);}
+    .row{margin:10px 0; color:#cbd5e1;}
+    b{color:#fff;}
+    a{color:#22c55e; text-decoration:none; font-weight:800;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Mes données</h2>
+
+    {% if profile %}
+      <div class="row"><b>Username :</b> {{ request.user.username }}</div>
+      <div class="row"><b>Nom :</b> {{ profile.nom }}</div>
+      <div class="row"><b>Prénom :</b> {{ profile.prenom }}</div>
+      <div class="row"><b>Téléphone :</b> {{ profile.telephone }}</div>
+      <div class="row"><b>Email :</b> {{ profile.email }}</div>
+      <div class="row"><b>Telegram :</b> {{ profile.telegram }}</div>
+      <div class="row"><b>Niveau :</b> {{ profile.niveau }}</div>
+    {% else %}
+      <p>Profil non trouvé.</p>
+    {% endif %}
+
+    <p style="margin-top:14px;">
+      <a href="{% url 'dashboard' %}">← Retour au dashboard</a>
+    </p>
+  </div>
+</body>
+</html>

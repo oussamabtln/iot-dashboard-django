@@ -198,6 +198,9 @@
     }
     .alert-close:hover{transform:scale(1.06); background: rgba(255,255,255,.15);}
 
+    /* ✅ demandé: enlever la croix des alertes (sans supprimer le HTML) */
+    .alert-close{ display:none !important; }
+
     .alert-head{
       display:flex; align-items:center; justify-content:space-between;
       margin-bottom: 8px;
@@ -360,7 +363,6 @@
     }
     .btn-action:hover{transform:translateY(-5px); background:var(--text-main); color:var(--modal-bg) !important; box-shadow:0 5px 20px var(--shadow-color);}
 
-    /* ✅ MENU (hamburger) */
     .menu-btn{
       position:fixed;
       top:20px;
@@ -412,61 +414,335 @@
       font-family:'Rajdhani';
       font-weight:800;
     }
-    .side-menu input[type="password"]{
+
+    .danger-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid rgba(239, 68, 68, .45);
+      background: rgba(239, 68, 68, .12);
+      color: #fecaca;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:'Rajdhani';
+      font-weight:900;
+      letter-spacing:.5px;
+      transition:.2s;
+    }
+    .danger-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(239, 68, 68, .20);
+      box-shadow: 0 10px 25px rgba(239, 68, 68, .18);
+    }
+    .danger-input{
       width:100%;
       padding:12px 14px;
       border-radius:14px;
-      border:1px solid var(--card-border);
-      background: var(--input-bg);
+      border:1px solid rgba(239, 68, 68, .35);
+      background: rgba(0,0,0,.25);
       color: var(--text-main);
       margin-top:10px;
       outline:none;
     }
+    .danger-note{
+      margin-top:8px;
+      font-size:.9rem;
+      color: var(--text-sub);
+      line-height:1.35;
+    }
+
+    .side-menu, .side-menu * { box-sizing: border-box; }
+
+    .side-menu-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .side-menu-actions{ margin-top: 10px; }
+
+    .menu-form{ margin-top: 10px; width:100%; }
+    .field{ width:100%; margin-top:10px; }
+    .field-label{
+      display:block;
+      font-family:'Rajdhani';
+      font-weight:900;
+      letter-spacing:.4px;
+      margin-bottom:8px;
+      color: var(--text-sub);
+    }
+
+    .input-wrap{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--card-border);
+      background: var(--input-bg);
+      border-radius:14px;
+      padding:8px 10px;
+    }
+
+    .menu-input{
+      width:100%;
+      min-width:0;
+      border:none !important;
+      outline:none;
+      background: transparent !important;
+      color: var(--text-main);
+      padding:10px 6px;
+      border-radius:12px;
+      font-size: 0.98rem;
+    }
+
+    .menu-btn-full{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid var(--card-border);
+      background: rgba(0,0,0,.22);
+      color: var(--text-main);
+      cursor:pointer;
+      font-family:'Rajdhani';
+      font-weight:900;
+    }
+    .danger-btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      filter: grayscale(35%);
+    }
+
+    .side-menu{
+      transform: translateX(-18px);
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease, left .25s;
+      will-change: transform, opacity;
+    }
+    .side-menu.open{
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .menu-backdrop{
+      opacity:0;
+      transition: opacity .25s ease;
+    }
+    .menu-backdrop.show{
+      display:block;
+      opacity:1;
+    }
+
+    .modal{ position:fixed; inset:0; display:none; z-index:2000; }
+    .modal.show{ display:block; }
+    .modal-backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(2px);
+      opacity:0;
+      animation: fadeIn .18s ease forwards;
+    }
+    @keyframes fadeIn{ to{ opacity:1; } }
+
+    .modal-dialog{
+      position:relative;
+      width:min(520px, calc(100% - 28px));
+      margin: 90px auto 0;
+      border-radius:20px;
+      border:1px solid var(--card-border);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 70px rgba(0,0,0,.45);
+      transform: translateY(10px) scale(.98);
+      opacity:0;
+      animation: popIn .18s ease forwards;
+    }
+    @keyframes popIn{ to{ transform: translateY(0) scale(1); opacity:1; } }
+
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px 10px;
+    }
+    .modal-title{
+      font-family:'Rajdhani';
+      font-weight: 900;
+      font-size: 1.25rem;
+    }
+    .modal-x{
+      width:40px; height:40px;
+      border-radius:12px;
+      border:1px solid var(--card-border);
+      background: rgba(0,0,0,.18);
+      color: var(--text-main);
+      cursor:pointer;
+    }
+    .modal-body{
+      padding: 0 16px 14px;
+      color: var(--text-main);
+      line-height: 1.45;
+    }
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      padding: 0 16px 16px;
+    }
+    .modal-btn{
+      flex:1;
+      border-radius:14px;
+      border:1px solid var(--card-border);
+      background: rgba(0,0,0,.18);
+      color: var(--text-main);
+      padding: 12px 14px;
+      cursor:pointer;
+      font-family:'Rajdhani';
+      font-weight:900;
+    }
+    .modal-btn.danger{
+      border-color: rgba(239, 68, 68, .45);
+      background: rgba(239, 68, 68, .12);
+      color: #fecaca;
+    }
+
+    /* ======================================================
+       ✅ MENU FIX FINAL (important)
+       ====================================================== */
+    #sideMenu{ z-index: 5000 !important; overflow:auto; -webkit-overflow-scrolling: touch; }
+    #menuBackdrop{ z-index: 4900 !important; }
+    #confirmModal{ z-index: 6000 !important; }
+
+    #sideMenu, #sideMenu *{ pointer-events:auto !important; }
+    #menuBackdrop{ pointer-events:auto !important; }
   </style>
 </head>
 
 <body>
 
-  <!-- ✅ MENU -->
   <button class="menu-btn" type="button" onclick="openMenu()">☰</button>
   <div id="menuBackdrop" class="menu-backdrop" onclick="closeMenu()"></div>
 
-  <div id="sideMenu" class="side-menu">
-    <h3>Opérateur</h3>
-
-    <div class="meta">
-      <div><b>{{ request.user.username }}</b></div>
+  <div id="sideMenu" class="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
       <div>
-        {% if profile %}
-          {{ profile.prenom }} {{ profile.nom }} — {{ profile.get_niveau_display }}
-          {% if profile.telephone %}<br>Tél: {{ profile.telephone }}{% endif %}
-        {% else %}
-          (Profil non défini)
-        {% endif %}
+        <h3>Opérateur</h3>
+        <div class="meta">
+          <div><b>{{ request.user.username }}</b></div>
+          <div>
+            {% if profile %}
+              {{ profile.prenom }} {{ profile.nom }} — {{ profile.get_niveau_display }}
+              {% if profile.telephone %}<br><span>Tél</span>: {{ profile.telephone }}{% endif %}
+            {% else %}
+              <span>(Profil non défini)</span>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
 
-    <a href="{% url 'logout' %}"><i class="fas fa-right-from-bracket"></i> Se déconnecter</a>
+    <div class="side-menu-actions">
+      <a href="{% url 'my_data' %}">
+        <i class="fas fa-id-card"></i>
+        <span>Mes données</span>
+      </a>
 
-    {% if is_directeur %}
-      <a href="{% url 'create_operateur' %}"><i class="fas fa-user-plus"></i> Ajouter un compte</a>
-
-      <form method="post" action="{% url 'purge_data' %}" style="margin-top:8px;">
+      <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
-        <input type="password" name="password" placeholder="Mot de passe directeur" required>
-        <button type="submit" onclick="return confirm('Confirmer la suppression de toutes les données ?');">
-          <i class="fas fa-broom"></i> Vider toutes les données
+        <button type="submit" class="danger-btn">
+          <i class="fas fa-right-from-bracket"></i>
+          Se déconnecter
         </button>
       </form>
-    {% endif %}
+
+      {% if is_directeur %}
+        <a href="{% url 'create_operateur' %}">
+          <i class="fas fa-user-plus"></i>
+          <span>Ajouter un compte</span>
+        </a>
+
+        <form method="post" action="{% url 'purge_data' %}" class="menu-form js-confirm"
+              data-confirm-title="⚠️"
+              data-confirm-body-fr="Confirmer la suppression de toutes les données ?"
+              data-confirm-cta-fr="Vider"
+        >
+          {% csrf_token %}
+
+          <div class="field">
+            <label class="field-label">Mot de passe directeur</label>
+            <div class="input-wrap">
+              <input type="password" name="password" placeholder="••••••••" required class="menu-input">
+            </div>
+          </div>
+
+          <button type="submit" class="menu-btn-full">
+            <i class="fas fa-broom"></i> <span>Vider toutes les données</span>
+          </button>
+        </form>
+      {% endif %}
+
+      <form method="post" action="{% url 'delete_my_account' %}" class="menu-form js-confirm"
+            data-confirm-title="🔐"
+            data-confirm-body-fr="Supprimer votre compte définitivement ? Cette action est irréversible."
+            data-confirm-cta-fr="Supprimer"
+      >
+        {% csrf_token %}
+
+        <div class="field">
+          <label class="field-label">Mot de passe pour supprimer</label>
+
+          <div class="input-wrap">
+            <input class="menu-input danger-input" type="password" name="password" placeholder="••••••••" required>
+          </div>
+
+          {% if is_last_directeur %}
+            <div class="danger-note" style="color:#fecaca;">
+              <i class="fas fa-shield-alt"></i>
+              <span>Impossible: vous êtes le dernier Directeur.</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <button class="danger-btn menu-btn-full" type="submit" {% if is_last_directeur %}disabled aria-disabled="true"{% endif %}>
+          <i class="fas fa-user-slash"></i> <span>Supprimer mon compte</span>
+        </button>
+
+        <div class="danger-note">
+          ⚠️ <span>Cette action supprime votre compte et votre profil.</span>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- ✅ THEME -->
+  <div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="1"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <div id="modalTitle" class="modal-title">⚠️</div>
+        <button type="button" class="modal-x" data-close-modal="1" aria-label="Close">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body">...</div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn" data-close-modal="1">
+          <span>Annuler</span>
+        </button>
+        <button type="button" class="modal-btn danger" id="modalConfirmBtn">OK</button>
+      </div>
+    </div>
+  </div>
+
   <button class="theme-switch" type="button" onclick="toggleTheme()"><i class="fas fa-adjust"></i> MODE JOUR/NUIT</button>
 
   <h1><i class="fas fa-satellite-dish"></i> IOT FACTORY SUPERVISION</h1>
 
-  <!-- ✅ STATUS BAR -->
   <div class="status-bar">
     <div class="pill">
       <span class="dot" id="netDot"></span>
@@ -483,12 +759,16 @@
       <span>MAJ: <span id="lastUpdate">--:--:--</span></span>
     </div>
 
+    <div class="pill">
+      <span class="dot" id="incidentDot"></span>
+      <span id="incidentMsg">Incident: ...</span>
+    </div>
+
     <button class="btn-mini" type="button" onclick="toggleAlarm()">
       <i class="fas fa-bell"></i> TOGGLE ALARME
     </button>
   </div>
 
-  <!-- ✅ DJANGO MESSAGES -->
   {% if messages %}
     <div class="toast-stack">
       {% for message in messages %}
@@ -511,7 +791,6 @@
 
   <div id="alertsStack" class="alerts-stack">
 
-    <!-- OP1 -->
     <div id="alertOp1" class="alert-card">
       <button class="alert-close" type="button" onclick="dismissPanel('op1')">✕</button>
 
@@ -532,7 +811,6 @@
       </form>
     </div>
 
-    <!-- CHEF -->
     <div id="alertOp2" class="alert-card">
       <button class="alert-close" type="button" onclick="dismissPanel('op2')">✕</button>
 
@@ -553,7 +831,6 @@
       </form>
     </div>
 
-    <!-- DIRECTEUR -->
     <div id="alertOp3" class="alert-card">
       <button class="alert-close" type="button" onclick="dismissPanel('op3')">✕</button>
 
@@ -576,12 +853,17 @@
 
   </div>
 
-  <!-- CARTES -->
   <div class="cards-container">
     <div class="card c-temp">
       <div class="card-icon"><i class="fas fa-thermometer-half"></i></div>
       <div class="card-lbl">Température</div>
       <div class="card-val"><span id="temp">--</span>°C</div>
+
+      <div style="font-family:'Rajdhani'; color:var(--text-sub); margin-top:6px;">
+        🕒 <span id="tempTime">--</span>
+
+      </div>
+
       <a href="{% url 'graph_temp' %}" class="btn-link"><i class="fas fa-chart-area"></i> Voir Courbe</a>
     </div>
 
@@ -589,6 +871,12 @@
       <div class="card-icon"><i class="fas fa-tint"></i></div>
       <div class="card-lbl">Humidité</div>
       <div class="card-val"><span id="hum">--</span>%</div>
+
+      <div style="font-family:'Rajdhani'; color:var(--text-sub); margin-top:6px;">
+        🕒 <span id="humTime">--</span>
+
+      </div>
+
       <a href="{% url 'graph_hum' %}" class="btn-link"><i class="fas fa-chart-line"></i> Voir Courbe</a>
     </div>
 
@@ -599,7 +887,6 @@
     </div>
   </div>
 
-  <!-- SIMULATION -->
   <div class="test-box">
     <span style="font-family:'Rajdhani'; letter-spacing:1px; color:var(--text-sub);"><i class="fas fa-vial"></i> SIMULATION :</span>
     <form action="{% url 'simulation_data' %}" method="POST" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
@@ -610,7 +897,6 @@
     </form>
   </div>
 
-  <!-- ACTIONS -->
   <div style="display:flex; gap:15px; margin-bottom:50px; flex-wrap:wrap; justify-content:center; z-index:10;">
     <a href="{% url 'csv_dht' %}" class="btn-action" style="border-color:#2ecc71; color:#2ecc71;">
       <i class="fas fa-file-csv"></i> Relevés T°/H%
@@ -621,10 +907,10 @@
     </a>
   </div>
 
-  <!-- Robot -->
   <div class="robot-wrapper" onclick="helloRobot()">
     <div id="bubble" class="bubble">Systèmes Prêts.</div>
 
+    <!-- ✅ نفس SVG ديالك (ما مسحت والو) -->
     <svg id="robot" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>
@@ -637,7 +923,6 @@
           <stop offset="100%" style="stop-color:rgba(52, 152, 219, 0)" />
         </linearGradient>
       </defs>
-
       <g id="body-group">
         <rect x="95" y="10" width="10" height="30" fill="url(#darkMetal)"/>
         <circle cx="100" cy="15" r="8" fill="#f1c40f" stroke="url(#darkMetal)" stroke-width="2" filter="url(#glow)"/>
@@ -669,13 +954,11 @@
         <path d="M45,120 C30,130 30,160 55,170" fill="url(#bodyGrad)" style="filter: drop-shadow(-3px 3px 3px rgba(0,0,0,0.3));"/>
         <path d="M155,120 C170,130 170,160 145,170" fill="url(#bodyGrad)" style="filter: drop-shadow(3px 3px 3px rgba(0,0,0,0.3));"/>
       </g>
-
       <g id="sunglasses">
         <rect x="60" y="82" width="35" height="25" rx="5" fill="#111" stroke="#fff"/>
         <rect x="105" y="82" width="35" height="25" rx="5" fill="#111" stroke="#fff"/>
         <line x1="95" y1="95" x2="105" y2="95" stroke="#fff" stroke-width="2"/>
       </g>
-
       <path id="ice-cap" d="M60,55 Q100,35 140,55 L140,70 Q130,80 120,70 Q110,85 100,70 Q90,80 80,70 Q70,85 60,70 Z" fill="#dff9fb" stroke="#3498db" stroke-width="2" filter="drop-shadow(0 0 5px #3498db)"/>
     </svg>
   </div>
@@ -684,8 +967,6 @@
 
   <script>
     const THEME_KEY = "theme_mode";
-
-    /* ✅ IMPORTANT: utiliser les URL Django (pas des strings hardcodées) */
     const API_URL = "{% url 'latest_json' %}";
     const TOGGLE_ALARM_URL = "{% url 'toggle_alarm' %}";
 
@@ -695,7 +976,6 @@
     const body = document.body;
     const alarmSound = document.getElementById("alarm-sound");
 
-    // WhatsApp (optionnel)
     const WA_PHONE = "{{ WA_PHONE|default:'+212000000000' }}";
     const WA_KEY   = "{{ WA_KEY|default:'YOUR_KEY' }}";
 
@@ -707,6 +987,40 @@
     const alarmDot = document.getElementById("alarmDot");
     const alarmText = document.getElementById("alarmText");
     const lastUpdate = document.getElementById("lastUpdate");
+    const incidentDot = document.getElementById("incidentDot");
+    const incidentMsg = document.getElementById("incidentMsg");
+
+    // ✅ cache: fermer une alerte seulement jusqu'à la prochaine mesure (counter change)
+    function getTempHideMap(){
+      try { return JSON.parse(sessionStorage.getItem("hide_until_counter") || "{}"); }
+      catch(e){ return {}; }
+    }
+    function setTempHideMap(map){
+      sessionStorage.setItem("hide_until_counter", JSON.stringify(map));
+    }
+    function hideUntilNextCounter(incidentId, which, currentCounter){
+      const map = getTempHideMap();
+      if (!map[incidentId]) map[incidentId] = {};
+      map[incidentId][which] = currentCounter;
+      setTempHideMap(map);
+    }
+    function isHiddenForCounter(incidentId, which, counter){
+      const map = getTempHideMap();
+      const until = map?.[incidentId]?.[which];
+      if (until === undefined || until === null) return false;
+      return counter <= parseInt(until);
+    }
+
+    function setIncidentUI(active, msg){
+      incidentDot.classList.remove("ok","bad","warn");
+      if (active){
+        incidentDot.classList.add("bad");
+        incidentMsg.innerText = msg || "Incident en cours";
+      } else {
+        incidentDot.classList.add("ok");
+        incidentMsg.innerText = msg || "Pas d’incident";
+      }
+    }
 
     function applySavedTheme(){
       const saved = localStorage.getItem(THEME_KEY);
@@ -760,10 +1074,18 @@
       });
     });
 
+    // ✅ fermeture manuelle (si tu ré-actives la croix plus tard)
     function dismissPanel(which){
       if (!currentIncidentId) return;
-      sessionStorage.setItem(`hide_${currentIncidentId}_${which}`, "1");
-      document.getElementById(which === "op1" ? "alertOp1" : which === "op2" ? "alertOp2" : "alertOp3").style.display = "none";
+
+      const cardId = (which === "op1") ? "alertOp1" : (which === "op2") ? "alertOp2" : "alertOp3";
+      const card = document.getElementById(cardId);
+
+      // ✅ important: أخذ counter من نفس الكارد
+      const c = parseInt(card.querySelector(".hiddenCounter")?.value || "0");
+      hideUntilNextCounter(String(currentIncidentId), which, c);
+
+      card.style.display = "none";
     }
 
     function dismissAckBanner(){
@@ -778,7 +1100,16 @@
       alarmSound.pause();
       activeAlert = false;
 
-      const card = document.getElementById(which === "op1" ? "alertOp1" : which === "op2" ? "alertOp2" : "alertOp3");
+      const cardId = (which === "op1") ? "alertOp1" : (which === "op2") ? "alertOp2" : "alertOp3";
+      const card = document.getElementById(cardId);
+
+      // ✅ بدل hide النهائي: نخبيها فقط حتى يزيد counter
+      const c = parseInt(event.target.querySelector(".hiddenCounter")?.value || "0");
+      if (currentIncidentId){
+        hideUntilNextCounter(String(currentIncidentId), which, c);
+      }
+
+      card.style.display = "none";
       card.style.opacity = "0.15";
       card.style.transform = "scale(0.98)";
 
@@ -808,9 +1139,9 @@
       const op2 = document.getElementById("alertOp2");
       const op3 = document.getElementById("alertOp3");
 
-      const hide1 = sessionStorage.getItem(`hide_${incident.id}_op1`) === "1";
-      const hide2 = sessionStorage.getItem(`hide_${incident.id}_op2`) === "1";
-      const hide3 = sessionStorage.getItem(`hide_${incident.id}_op3`) === "1";
+      const hide1 = isHiddenForCounter(String(incident.id), "op1", counter);
+      const hide2 = isHiddenForCounter(String(incident.id), "op2", counter);
+      const hide3 = isHiddenForCounter(String(incident.id), "op3", counter);
 
       op1.style.display = (show1 && !hide1) ? "block" : "none";
       op2.style.display = (show2 && !hide2) ? "block" : "none";
@@ -865,10 +1196,32 @@
       }
 
       currentIncidentId = incident.id;
+
       const outOfRange = (t < MIN_OK || t > MAX_OK);
 
-      if (mute){
+      if (!outOfRange){
         hideAllAlerts();
+        document.getElementById("ackBanner").style.display = "none";
+        if (activeAlert){ activeAlert = false; alarmSound.pause(); }
+        hideBubble();
+        return;
+      }
+
+      setCardsCounter(incident.counter || 0);
+
+      const txt = (t > MAX_OK)
+        ? `Température TROP HAUTE (>8°C) — T=${t.toFixed(1)}°C`
+        : `Température TROP BASSE (<2°C) — T=${t.toFixed(1)}°C`;
+
+      document.getElementById("statusOp1").innerText = txt;
+      document.getElementById("statusOp2").innerText = txt;
+      document.getElementById("statusOp3").innerText = txt;
+
+      showAlertsByCounter(incident.counter || 0, incident);
+
+      if (mute){
+        alarmSound.pause();
+        activeAlert = false;
 
         const hideAck = sessionStorage.getItem(`hide_ack_${incident.id}`) === "1";
         if (!hideAck){
@@ -877,8 +1230,6 @@
         } else {
           document.getElementById("ackBanner").style.display = "none";
         }
-
-        if (activeAlert){ activeAlert = false; alarmSound.pause(); }
 
         if (t < MIN_OK){
           body.classList.add("body-cold");
@@ -894,33 +1245,15 @@
 
       document.getElementById("ackBanner").style.display = "none";
 
-      if (outOfRange){
-        setCardsCounter(incident.counter || 0);
-
-        const txt = (t > MAX_OK)
-          ? `Température TROP HAUTE (>8°C) — T=${t.toFixed(1)}°C`
-          : `Température TROP BASSE (<2°C) — T=${t.toFixed(1)}°C`;
-
-        document.getElementById("statusOp1").innerText = txt;
-        document.getElementById("statusOp2").innerText = txt;
-        document.getElementById("statusOp3").innerText = txt;
-
-        showAlertsByCounter(incident.counter || 0, incident);
-
-        if (!activeAlert){
-          activeAlert = true;
-          alarmSound.play().catch(()=>{});
-        }
-
-        if (t > MAX_OK){ body.classList.add("body-alert"); bot.classList.add("robot-alert"); }
-        else { body.classList.add("body-cold"); bot.classList.add("robot-cold"); }
-
-        maybeSendWhatsApp(incident, t);
-      } else {
-        hideAllAlerts();
-        if (activeAlert){ activeAlert = false; alarmSound.pause(); }
-        hideBubble();
+      if (!activeAlert){
+        activeAlert = true;
+        alarmSound.play().catch(()=>{});
       }
+
+      if (t > MAX_OK){ body.classList.add("body-alert"); bot.classList.add("robot-alert"); }
+      else { body.classList.add("body-cold"); bot.classList.add("robot-cold"); }
+
+      maybeSendWhatsApp(incident, t);
     }
 
     function getCookie(name) {
@@ -938,7 +1271,6 @@
       return cookieValue;
     }
 
-    /* ✅ IMPORTANT: credentials same-origin pour CSRF */
     function toggleAlarm(){
       fetch(TOGGLE_ALARM_URL, {
         method: "POST",
@@ -987,13 +1319,24 @@
           const mute = !!data.alarme_coupee;
           const incident = data.incident || {active:false};
 
+          setIncidentUI(!!incident.active, data.message || "");
+
           document.getElementById("temp").innerText = t.toFixed(1);
           document.getElementById("hum").innerText = h.toFixed(0);
 
           setAlarm(mute);
 
-          const now = new Date();
-          lastUpdate.innerText = now.toLocaleTimeString("fr-FR");
+          // ✅ وقت آخر قياس: last_dt من السيرفر
+          if (data.last_dt){
+            lastUpdate.innerText = data.last_dt;
+            const t1 = document.getElementById("tempTime");
+            const t2 = document.getElementById("humTime");
+            if (t1) t1.innerText = data.last_dt;
+            if (t2) t2.innerText = data.last_dt;
+          } else {
+            const now = new Date();
+            lastUpdate.innerText = now.toLocaleTimeString("fr-FR");
+          }
 
           checkState(t, mute, incident);
         })
@@ -1003,18 +1346,94 @@
     setInterval(update, 2000);
     update();
 
+    /* ======================================================
+       ✅ MENU JS (UNE SEULE VERSION) - FIXÉ
+       ====================================================== */
     function openMenu(){
-      document.getElementById("sideMenu").classList.add("open");
-      document.getElementById("menuBackdrop").style.display = "block";
-    }
-    function closeMenu(){
-      document.getElementById("sideMenu").classList.remove("open");
-      document.getElementById("menuBackdrop").style.display = "none";
+      const menu = document.getElementById("sideMenu");
+      const backdrop = document.getElementById("menuBackdrop");
+
+      menu.classList.add("open");
+      menu.setAttribute("aria-hidden", "false");
+
+      backdrop.style.display = "block";
+      requestAnimationFrame(() => backdrop.classList.add("show"));
+
+      const first = menu.querySelector("input");
+      if (first) setTimeout(()=> first.focus({preventScroll:true}), 50);
     }
 
-    /* ✅ Bonus: fermer le menu après clic */
+    function closeMenu(){
+      const menu = document.getElementById("sideMenu");
+      const backdrop = document.getElementById("menuBackdrop");
+
+      menu.classList.remove("open");
+      menu.setAttribute("aria-hidden", "true");
+
+      backdrop.classList.remove("show");
+      setTimeout(()=>{ backdrop.style.display = "none"; }, 220);
+    }
+
+    document.getElementById("sideMenu").addEventListener("click", (e)=> e.stopPropagation());
+
     document.querySelectorAll("#sideMenu a").forEach(a => {
       a.addEventListener("click", closeMenu);
+    });
+
+    /* ======================================================
+       ✅ MODAL DE CONFIRMATION (remplace confirm())
+       ====================================================== */
+    const modal = document.getElementById("confirmModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+    let pendingForm = null;
+
+    function openModal({title, body, ctaText}){
+      modalTitle.textContent = title || "⚠️";
+      modalBody.textContent = body || "...";
+      modalConfirmBtn.textContent = ctaText || "OK";
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(){
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "";
+      pendingForm = null;
+    }
+
+    modal.addEventListener("click", (e) => {
+      if (e.target && e.target.getAttribute("data-close-modal") === "1") closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.classList.contains("show")) closeModal();
+    });
+
+    modalConfirmBtn.addEventListener("click", () => {
+      if (pendingForm) pendingForm.submit();
+      closeModal();
+    });
+
+    document.querySelectorAll("form.js-confirm").forEach(form => {
+      form.addEventListener("submit", (e) => {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn && submitBtn.disabled) {
+          e.preventDefault();
+          return;
+        }
+
+        e.preventDefault();
+        pendingForm = form;
+
+        const title = form.getAttribute("data-confirm-title") || "🔐";
+        const bodyText = form.getAttribute("data-confirm-body-fr") || "";
+        const cta = form.getAttribute("data-confirm-cta-fr") || "OK";
+
+        openModal({title, body: bodyText, ctaText: cta});
+      });
     });
   </script>
 </body>

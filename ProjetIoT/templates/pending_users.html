@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Comptes en attente</title>
+</head>
+<body>
+  <h2>Comptes en attente</h2>
+
+  {% if messages %}
+    {% for m in messages %}<p>{{ m }}</p>{% endfor %}
+  {% endif %}
+
+  <p><a href="{% url 'dashboard' %}">⬅ Retour dashboard</a></p>
+
+  <table border="1" cellpadding="8">
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Date demande</th>
+      <th>Actions</th>
+    </tr>
+
+    {% for u in users %}
+      <tr>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.date_joined }}</td>
+        <td>
+          <form method="post" action="{% url 'approve_user' u.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">✅ Approuver</button>
+          </form>
+
+          <form method="post" action="{% url 'reject_user' u.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Supprimer ce compte ?')">❌ Rejeter</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">Aucun compte en attente</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* نفس روح تصميم dashboard: dark glass + gradients */
+:root{
+  --bg1:#0f172a;
+  --bg2:#1e293b;
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --card: rgba(30, 41, 59, 0.65);
+  --border: rgba(255,255,255,0.10);
+  --shadow: rgba(0,0,0,0.35);
+  --grad: linear-gradient(45deg,#3498db,#f39c12);
+}
+
+body, #container{
+  background: radial-gradient(circle at center, var(--bg2), var(--bg1), #000);
+  background-size: 400% 400%;
+  animation: gradientBG 14s ease infinite;
+  color: var(--text);
+}
+
+@keyframes gradientBG{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* top header */
+#header{
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 10px 25px var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.admin-brand{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding: 6px 0;
+}
+.admin-title{
+  font-weight: 900;
+  letter-spacing: 1px;
+  font-size: 18px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+.admin-subtitle{
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.admin-nav{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.admin-btn{
+  display:inline-block;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text) !important;
+  text-decoration:none;
+  font-weight: 800;
+  transition: .2s;
+}
+.admin-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px var(--shadow);
+}
+
+/* cards (modules) */
+.module, .app-auth, .app-dht, .dashboard-module, .inline-group{
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+/* tables */
+#content-main table{
+  border-radius: 14px;
+  overflow:hidden;
+}
+#content-main th{
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text) !important;
+}
+#content-main td{
+  color: var(--text) !important;
+}
+
+/* buttons */
+input[type=submit], .button, a.button{
+  background: var(--grad) !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-weight: 900 !important;
+  letter-spacing: .5px;
+  padding: 10px 14px !important;
+}
+input[type=submit]:hover, .button:hover, a.button:hover{
+  opacity: .92;
+  transform: translateY(-1px);
+}
+
+/* forms inputs */
+input, select, textarea{
+  background: rgba(0,0,0,0.35) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 12px !important;
+}
+.help, .helptext{
+  color: var(--muted) !important;
+}
+
+/* breadcrumbs */
+div.breadcrumbs{
+  background: transparent !important;
+  color: var(--muted) !important;
+}
+div.breadcrumbs a{
+  color: var(--text) !important;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(255,255,255,0.25);
+}

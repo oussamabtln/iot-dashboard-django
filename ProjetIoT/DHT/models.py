@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
+
 
 # --- MODELE 1 : CAPTEUR (T° / H%) ---
 class Dht11(models.Model):
@@ -11,12 +12,8 @@ class Dht11(models.Model):
         return f"{self.temp}°C / {self.hum}%"
 
 
-# --- MODELE 2 : OPERATEUR (TP) ---
+# --- MODELE 2 : PROFIL OPERATEUR ---
 class OperateurProfile(models.Model):
-    """
-    Profil opérateur (infos métier).
-    Auth (login/mot de passe) gérée par le User Django.
-    """
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -26,39 +23,41 @@ class OperateurProfile(models.Model):
     nom = models.CharField(max_length=60)
     prenom = models.CharField(max_length=60)
     telephone = models.CharField(max_length=30, blank=True)
-    email = models.EmailField(blank=True)  # optionnel (User a déjà email)
+    email = models.EmailField(blank=True)
+    telegram = models.CharField(max_length=80, blank=True)
 
-    # Optionnel si tu veux "niveaux" OP1/OP2/OP3
+    # 1=op1, 2=chef, 3=directeur (كتخدم حتى مع str فـ views)
     niveau = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
         return f"Op{self.niveau} - {self.prenom} {self.nom} ({self.user.username})"
 
 
-# --- MODELE 3 : INCIDENTS (ALERTE + ARCHIVES) ---
+# --- MODELE 3 : INCIDENTS ---
 class Incident(models.Model):
     KIND_CHOICES = [
         ("HOT", "HOT"),
         ("COLD", "COLD"),
     ]
 
-    created_at = models.DateTimeField(auto_now_add=True)          # début incident
-    ended_at = models.DateTimeField(null=True, blank=True)        # fin incident
-    is_open = models.BooleanField(default=True)                   # état ouvert/fermé
+    notified_lvl1 = models.BooleanField(default=False)
+    notified_lvl2 = models.BooleanField(default=False)
+    notified_lvl3 = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    is_open = models.BooleanField(default=True)
 
     kind = models.CharField(max_length=4, choices=KIND_CHOICES, default="HOT")
-
-    # HOT: max atteint | COLD: min atteint (nom conservé)
     max_temp = models.FloatField(null=True, blank=True)
 
-    counter = models.IntegerField(default=0)                      # compteur alertes 0..9
-    last_counter_at = models.DateTimeField(null=True, blank=True) # incrément auto
+    counter = models.IntegerField(default=0)
+    last_counter_at = models.DateTimeField(null=True, blank=True)
+    last_dht_id = models.IntegerField(null=True, blank=True)
 
-    # ✅ Champs demandés par le TP (plage autorisée)
     temp_min_autorisee = models.FloatField(default=2.0)
     temp_max_autorisee = models.FloatField(default=8.0)
 
-    # ACK + commentaires (tu peux garder)
     op1_ack = models.BooleanField(default=False)
     op1_comment = models.CharField(max_length=200, null=True, blank=True)
 
@@ -70,3 +69,40 @@ class Incident(models.Model):
 
     def __str__(self):
         return f"Incident #{self.id} ({'OPEN' if self.is_open else 'CLOSED'})"
+
+
+# --- MODELE COMMENTS (مرة وحدة فقط) ---
+class IncidentComment(models.Model):
+    ROLE_CHOICES = [
+        ("OP1", "Opérateur 1"),
+        ("OP2", "Chef équipe"),
+        ("OP3", "Directeur"),
+    ]
+
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name="comments")
+    role = models.CharField(max_length=3, choices=ROLE_CHOICES)
+    text = models.CharField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"Comment {self.role} on incident {self.incident_id}"
+
+
+# --- MODELE 4 : REGLAGES IOT ---
+class IoTSettings(models.Model):
+    temp_min = models.FloatField(default=2.0)
+    temp_max = models.FloatField(default=8.0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Réglages IoT"
+        verbose_name_plural = "Réglages IoT"
+
+    def __str__(self):
+        return f"Réglages IoT (min={self.temp_min}, max={self.temp_max})"
+
+    @classmethod
+    def get_solo(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
